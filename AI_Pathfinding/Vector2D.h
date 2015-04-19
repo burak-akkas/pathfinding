@@ -41,5 +41,5 @@ struct Vector2D {
 	const Vector2D& operator*=(const double& rhs);
 	const Vector2D& operator/=(const double& rhs);
 	bool operator==(const Vector2D& rhs) const;
-	bool operator!=(const Vector2D& rhs) const;
+	bool operator!=(const Vector2D& rhs) const; 
 };
