@@ -1,15 +1,5 @@
 #include <vector>
-
-class Edge {
-private:
-	int vertex;
-	int weight;
-public:
-	Edge();
-	Edge(int v, int w) : vertex(v), weight(w) {}
-	int getWeight() { return weight; }
-	int getVertex() { return vertex; }
-};
+#include "Edge.h"
 
 class Graph {
 private:
@@ -17,7 +7,8 @@ private:
 public:
 	Graph();
 	Graph(int n);
-	void addEdge(int from, int to, int weight);
-	std::vector<int> getAdjecency(int vertex);
+	void addEdge(Vertex from, Vertex to, int weight);
+	std::vector<Vertex> getAdjecency(Vertex vertex);
 	int totalWeight();
+	void printGraph();
 };

@@ -1,39 +1,37 @@
-struct Vector2D {
+class Vector2D {
+private:
 	double x;
 	double y;
 
-	Vector2D() :x(0.0), y(0.0) {	}
+public:
+	Vector2D() : x(0.0), y(0.0) { }
+	Vector2D(double t_x, double t_y) : x(t_x), y(t_y) { }
 
 	// sets x and y to zero
-	inline void 	Zero();
+	void 	Zero();
 
 	// returns true if both x and y are zero
-	inline bool 	isZero() const;
+	bool 	isZero();
 
 	// returns the length of the vector
-	inline double 	Length() const;
+	double 	Length();
 
 	// returns the squared length of the vector
-	inline double 	LengthSq() const;
-
-	// returns positive if vector 2 is clockwise of this vector,
-	// 		   negative if counter-clockwise
-	inline int 		Sign(const Vector2D& v2) const;
-
-	// returns the vector that is perpendicular to this one
-	inline Vector2D	Perp() const;
-
-	// adjusts x and y so that the length of the vector does not exceed max
-	inline void 	Truncate(double max);
+	double 	LengthSq();
 
 	// returns the distance between this vector and the one passed as a parameter
-	inline void 	Distance(const Vector2D& v2) const;
+	double 	Distance(const Vector2D& v2);
 
-	// square version of distance
-	inline void 	DistanceSq(const Vector2D& v2) const;
+	// copies given Vector2D
+	void copy(Vector2D rhs);
 
-	// returns the vector that is the reverse of this vector
-	inline Vector2D GetReverse() const;
+	// Getter
+	double getX();
+	double getY();
+
+	// Setter
+	void setX(double t_x);
+	void setY(double t_y);
 
 	// operators for vector operations
 	const Vector2D& operator+=(const Vector2D& rhs);
