@@ -2,13 +2,14 @@
 Application of pathfinding algorithms using C++
 
 Following will be applied:
+
 Best-First Search, 
 http://en.wikipedia.org/wiki/Best-first_search
 
-A*, 
+A-star, 
 http://en.wikipedia.org/wiki/A*_search_algorithm
 
-IDA*, 
+IDA-star, 
 http://en.wikipedia.org/wiki/IDA*
 
 Dijkstra's Algorithm,
