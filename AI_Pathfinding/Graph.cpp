@@ -1,51 +1,186 @@
 #include "Graph.h"
-#include <iostream>
 
 Graph::Graph() {
-	adjecency.resize(10);
+	size = 0;
+	initGrid();
 }
 
-Graph::Graph(int n) {
-	adjecency.resize(n);
+Graph::Graph(int s) {
+	size = s;
+	initGrid();
 }
 
-
-void Graph::addEdge(Vertex from, Vertex to, int weight) {
-	adjecency[from.vertex_number].push_back(Edge(to, weight));
+void Graph::initGrid() {
+	for (int y = 0; y < size; y++) {
+		std::vector<Node*> tmp;
+		for (int x = 0; x < size; x++) {
+			tmp.push_back(new Node(x, y));
+		}
+		grid.push_back(tmp);
+		tmp.clear();
+	}
 }
 
-std::vector<Vertex> Graph::getAdjecency(Vertex vertex) {
-	std::vector<Vertex> t;
-	//for (size_t i = 0; i < adjecency[vertex].size(); ++i) {
-	//	t.push_back(adjecency[vertex].at(i).getDestinationVertex());
-	//}
+/*int Graph::heuristic(Node *current, Node *target) {
+	return fmaxf(abs(current->getX() - target->getX()),
+		abs(current->getY() - target->getY()));
+}*/
 
-	return t;
-}
-
-int Graph::totalWeight() {
-	int total = 0;
-
-	for (size_t i = 0; i < adjecency.size(); ++i) {
-		for (size_t j = 0; j < adjecency[i].size(); ++j) {
-			total += adjecency[i].at(j).getWeight();
+bool Graph::search(Node* n, std::vector<Node*> path) {
+	for (size_t y = 0; y < path.size(); y++) {
+		if (path.at(y)->equals(n)) {
+			return true;
 		}
 	}
+	return false;
+}
 
-	return total;
+void Graph::setObstacle(int x, int y) {
+	grid.at(y).at(x)->setObstacle();
+}
+
+std::string Graph::findShortestPathAstar(int start_x, int start_y, int finish_x, int finish_y) {
+
+	std::vector<Node*> path;
+
+	Node *start = grid[start_y][start_x];
+	Node *end = grid[finish_y][finish_x];
+	Node *current = NULL;
+	Node *child = NULL;
+
+	std::list<Node*> openList;
+	std::list<Node*> closedList;
+	std::list<Node*>::iterator i;
+
+	openList.push_back(start);
+	start->opened = true;
+
+	int n = 0;
+
+	while (current != end && n != 100)
+	{
+		for (i = openList.begin(); i != openList.end(); ++i)
+		{
+			if (i == openList.begin() || (*i)->getFScore() <= current->getFScore())
+			{
+				current = (*i);
+			}
+		}
+
+		if (current == end)
+		{
+			break;
+		}
+
+		openList.remove(current);
+		current->opened = false;
+
+		closedList.push_back(current);
+		current->closed = true;
+
+		for (int x = -1; x < 2; x++)
+		{
+			for (int y = -1; y < 2; y++)
+			{
+				if (x == 0 && y == 0)
+				{
+					continue;
+				}
+
+				if (current->getX() + x < 0 || current->getY() + y < 0 || current->getX() + x == size || current->getY() + y == size) {
+					continue;
+				}
+
+				child = grid[current->getY() + y][current->getX() + x];
+
+				if (child->closed || child->isObstacle())
+				{
+					continue;
+				}
+
+				if (x != 0 && y != 0)
+				{
+					if (grid[current->getY() + y][current->getX()]->isObstacle() || grid[current->getY() + y][current->getX()]->closed)
+					{
+						continue;
+					}
+					if (grid[current->getY()][current->getX() + x]->isObstacle() || grid[current->getY()][current->getX() + x]->closed)
+					{
+						continue;
+					}
+				}
+
+				if (child->opened)
+				{
+					if (child->getGScore() > child->getGScore(current))
+					{
+						child->setParent(current);
+						child->computeScores(end);
+					}
+				}
+				else
+				{
+					openList.push_back(child);
+					child->opened = true;
+
+					child->setParent(current);
+					child->computeScores(end);
+				}
+			}
+		}
+
+		n++;
+
+		if (n >= 100) { return "PATH NOT FOUND!"; }
+	}
+
+	while (current->hasParent() && !current->equals(start))
+	{
+		path.push_back(current);
+		current = current->getParent();
+	}
+
+	// print path
+	printPath(path, start, end);
+
+	// for testing
+	//for (size_t i = 0; i < path.size(); i++) {
+	//	std::cout << path[i]->toString() << "\n";
+	//}
+
+	return "Path found!";
 }
 
 void Graph::printGraph() {
-	for (int i = 0; i < adjecency.size(); i++)
-	{
-		std::vector<int> t;
-		//t = getAdjecency(i);
-		if (t.size() != 0) {
-			std::cout << i << "->";
-			for (std::vector<int>::iterator it = t.begin(); it != t.end(); ++it) {
-				std::cout << *it << "->";
-			}
-			std::cout << std::endl;
+	for (int y = 0; y < size; y++) {
+		for (int x = 0; x < size; x++) {
+			Node *n = grid.at(y).at(x);
+			std::cout << "[" << n->isObstacle() << "] ";
 		}
+		std::cout << std::endl;
+	}
+}
+
+void Graph::printPath(std::vector<Node*> path, Node* start, Node* finish) {
+	for (int y = 0; y < size; y++) {
+		for (int x = 0; x < size; x++) {
+			if (grid.at(y).at(x)->isObstacle()) {
+				std::cout << "X ";
+			}
+			else if (grid.at(y).at(x)->equals(start)) {
+				std::cout << "S ";
+			}
+			else if (grid.at(y).at(x)->equals(finish)) {
+				std::cout << "F ";
+			}
+			else if (search(grid.at(y).at(x), path)) {
+				std::cout << "* ";
+			}
+			else {
+				std::cout << "0 ";
+			}
+		}
+
+		std::cout << std::endl;
 	}
 }

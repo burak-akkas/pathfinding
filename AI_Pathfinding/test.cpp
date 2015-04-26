@@ -1,24 +1,28 @@
-#include <iostream>
 #include "Graph.h"
-#include <SFML\Graphics.hpp>
 
 int main() {
-	Graph g;
+	Graph *g = new Graph(8);
 
-	Vertex v1("A", 0, 0), v2("B", 5, 0) , v3("C", 0, 5), v4("D", 5, 5);
+	g->setObstacle(1, 1);
+	g->setObstacle(1, 2);
+	g->setObstacle(1, 3);
+	g->setObstacle(1, 4);
+	g->setObstacle(1, 5);
+	g->setObstacle(1, 6);
+	g->setObstacle(1, 0);
+	g->setObstacle(5, 6);
+	g->setObstacle(3, 2);
+	g->setObstacle(6, 1);
+	g->setObstacle(6, 3);
+	g->setObstacle(6, 4);
+	g->setObstacle(5, 4);
+	g->setObstacle(5, 3);
 
-	g.addEdge(v1, v2, 5);
-	g.addEdge(v1, v3, 5);
-	g.addEdge(v2, v4, 5);
-	g.addEdge(v3, v4, 5);
+	std::cout << g->findShortestPathAstar(0, 0, 7, 0);
 
-	//g.printGraph();
-
-	// A ---- B
-	// |      |
-	// |      |
-	// C ---- D
+	//g->printGraph();
 
 	std::cin.get();
+
 	return 0;
 }
