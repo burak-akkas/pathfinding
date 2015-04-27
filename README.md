@@ -6,7 +6,7 @@ Following will be applied:
 Best-First Search, 
 http://en.wikipedia.org/wiki/Best-first_search
 
-A-star, 
+A-star, (implemented)
 http://en.wikipedia.org/wiki/A*_search_algorithm
 
 IDA-star, 
