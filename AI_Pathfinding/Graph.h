@@ -17,7 +17,7 @@ public:
 	Graph(int s);
 
 	void setObstacle(int x, int y);
-	std::string findShortestPathAstar(int start_x, int start_y, int finish_x, int finish_y);
+	std::vector<int> findShortestPathAstar(int start_x, int start_y, int finish_x, int finish_y);
 	void printGraph();
-	void printPath(std::vector<Node*> path, Node* start, Node* finish);
+	std::vector<int> printPath(std::vector<Node*> path, Node* start, Node* finish);
 };

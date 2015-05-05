@@ -39,7 +39,7 @@ void Graph::setObstacle(int x, int y) {
 	grid.at(y).at(x)->setObstacle();
 }
 
-std::string Graph::findShortestPathAstar(int start_x, int start_y, int finish_x, int finish_y) {
+std::vector<int> Graph::findShortestPathAstar(int start_x, int start_y, int finish_x, int finish_y) {
 
 	std::vector<Node*> path;
 
@@ -131,7 +131,7 @@ std::string Graph::findShortestPathAstar(int start_x, int start_y, int finish_x,
 
 		n++;
 
-		if (n >= 100) { return "PATH NOT FOUND!"; }
+		if (n >= 100) { std::vector<int> t; return t; }
 	}
 
 	while (current->hasParent() && !current->equals(start))
@@ -141,14 +141,14 @@ std::string Graph::findShortestPathAstar(int start_x, int start_y, int finish_x,
 	}
 
 	// print path
-	printPath(path, start, end);
+	//printPath(path, start, end);
 
 	// for testing
 	//for (size_t i = 0; i < path.size(); i++) {
 	//	std::cout << path[i]->toString() << "\n";
 	//}
 
-	return "Path found!";
+	return printPath(path, start, end);
 }
 
 void Graph::printGraph() {
@@ -161,26 +161,35 @@ void Graph::printGraph() {
 	}
 }
 
-void Graph::printPath(std::vector<Node*> path, Node* start, Node* finish) {
+std::vector<int> Graph::printPath(std::vector<Node*> path, Node* start, Node* finish) {
+	std::vector<int> t;	t.push_back(0);
+
 	for (int y = 0; y < size; y++) {
 		for (int x = 0; x < size; x++) {
 			if (grid.at(y).at(x)->isObstacle()) {
 				std::cout << "X ";
+				t.push_back(1);
 			}
 			else if (grid.at(y).at(x)->equals(start)) {
 				std::cout << "S ";
+				t.push_back(4);
 			}
 			else if (grid.at(y).at(x)->equals(finish)) {
 				std::cout << "F ";
+				t.push_back(6);
 			}
 			else if (search(grid.at(y).at(x), path)) {
 				std::cout << "* ";
+				t.push_back(2);
 			}
 			else {
 				std::cout << "0 ";
+				t.push_back(0);
 			}
 		}
 
 		std::cout << std::endl;
 	}
+
+	return t;
 }
