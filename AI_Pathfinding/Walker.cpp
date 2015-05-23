@@ -1,13 +1,10 @@
 #include "Walker.h"
 
-sf::Vector2f normalize(const sf::Vector2f& source);
-float distance(sf::Vector2f p1, sf::Vector2f p2);
-
 Walker::Walker() {
 	speed = 100.f;
 
 	position.x = 8.f * 32;
-	position.y = 8.f * 32 - 24;
+	position.y = 8.f * 32 - 20;
 
 	// sprite prop
 	load();
@@ -19,8 +16,8 @@ Walker::Walker() {
 Walker::Walker(float x, float y) {
 	speed = 100.f;
 
-	position.x = x;
-	position.y = y - 24;
+	position.x = x * 32;
+	position.y = y * 32 - 20;
 
 	// sprite prop
 	load();
@@ -38,10 +35,10 @@ void Walker::load() {
 void Walker::move(float time) {
 	if (canMove == true)
 	{
-		if (distance(position, destination) > 5.f)
+		if (Util::distance(position, destination) > 5.f)
 		{
 			position += direction * speed * time;
-			sprite.setPosition(position.x, position.y - 24);
+			sprite.setPosition(position.x, position.y - 20);
 		}
 		else if (path.size() > 0)
 		{
@@ -58,7 +55,7 @@ void Walker::move(float time) {
 void Walker::setDestination(sf::Vector2f *d) {
 	destination = *d;
 	direction = destination - position;
-	direction = normalize(direction);
+	direction = Util::normalize(direction);
 	canMove = true;
 }
 
@@ -98,22 +95,6 @@ sf::Sprite Walker::getSprite() {
 
 bool Walker::isCanMove() {
 	return canMove;
-}
-
-float distance(sf::Vector2f p1, sf::Vector2f p2)
-{
-	float diffY = p1.y - p2.y;
-	float diffX = p1.x - p2.x;
-	return sqrt((diffY * diffY) + (diffX * diffX));
-}
-
-sf::Vector2f normalize(const sf::Vector2f& source)
-{
-	float length = sqrt((source.x * source.x) + (source.y * source.y));
-	if (length != 0)
-		return sf::Vector2f(source.x / length, source.y / length);
-	else
-		return source;
 }
 
 void Walker::draw(sf::RenderTarget& target, sf::RenderStates states) const

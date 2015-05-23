@@ -26,11 +26,6 @@ void Graph::initGrid() {
 	}
 }
 
-/*int Graph::heuristic(Node *current, Node *target) {
-	return fmaxf(abs(current->getX() - target->getX()),
-		abs(current->getY() - target->getY()));
-}*/
-
 bool Graph::search(Node* n, std::vector<Node*> path) {
 	for (size_t y = 0; y < path.size(); y++) {
 		if (path.at(y)->equals(n)) {
@@ -156,12 +151,6 @@ std::vector<int> Graph::findShortestPathAstar(int start_x, int start_y, int fini
 		current = current->getParent();
 	}
 
-
-	/*for (size_t i = 0; i < path.size(); i++) {
-		if (i % 16 == 0) { std::cout << std::endl; }
-		std::cout << "(" << path[i]->getX() << ", " << path[i]->getY() << ")";
-	}*/
-
 	resetNodes();
 
 	return printPath(path, start, end);
@@ -206,11 +195,6 @@ std::vector<int> Graph::printPath(std::vector<Node*> *path, Node* start, Node* f
 
 		//std::cout << std::endl;
 	}
-
-	/*std::cout << t.size() << std::endl;
-	for (size_t i = 0; i < t.size(); ++i) {
-		std::cout << t.at(i);
-	}*/
 
 	return t;
 }

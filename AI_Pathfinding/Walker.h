@@ -1,3 +1,5 @@
+#pragma once
+#include "Util.h"
 #include <SFML\Graphics.hpp>
 
 class Walker : sf::Sprite {

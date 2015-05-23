@@ -3,35 +3,32 @@
 #include "TileMap.h"
 #include "Walker.h"
 #include <algorithm>
-#include <string>
 
-std::vector<sf::Vector2f> nodeToVec(std::vector<Node*> n);
-const std::string tile_path = "tilea2.png";
+const float fixed_time = 0.08f;
+const int frame_limit = 20;
+const int screen_height = 512, screen_width = 512;
+const int graph_size = 16;
+const int coord_pixel = screen_height / graph_size;
+const std::string window_title = "Pathfinding";
 
 int main() {
-	Graph *g = new Graph(16);
-	Graph *prev = new Graph(16);
-	Walker *walker = new Walker(8 * 32, 8 * 32);
+	Graph *g = new Graph(graph_size);
+	TileMap map;
 	std::vector<int> path;
-	std::vector<Node*> *temp = new std::vector<Node*>;
+	std::vector<Node*> *directions = new std::vector<Node*>;
+	Walker *walker = new Walker(8, 8);
 
-	int x, y, x1, y1;
-
-	x = 8;
-	y = 8;
-	x1 = 8;
-	y1 = 8;
+	int x = 8, y = 8, x1 = 8, y1 = 8;
 
 	// create the window
-	sf::RenderWindow window(sf::VideoMode(512, 512), "Pathfinding");
+	sf::RenderWindow window(sf::VideoMode(screen_width, screen_height), window_title);
 
+	// limit fps
 	window.setVerticalSyncEnabled(true);
-	window.setFramerateLimit(20);
+	window.setFramerateLimit(frame_limit);
 	
 	// create the tilemap from the level definition
-	TileMap map;
-	if (!map.load(tile_path, sf::Vector2u(32, 32), g->emptyPath(x, y), 16, 16))
-		return -1;
+	map.update(g->emptyPath(x, y));
 
 	// run the main loop
 	// run the program as long as the window is open
@@ -52,25 +49,20 @@ int main() {
 			if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left) {
 				sf::Vector2i coord = sf::Mouse::getPosition(window);
 
-				if ((coord.x / 32 != x1 || coord.y / 32 != y1)) {
+				if ((coord.x / coord_pixel != x1 || coord.y / coord_pixel != y1)) {
 
-					if (!g->isObstacle(coord.x / 32, coord.y / 32)) {
-						g->setObstacle(coord.x / 32, coord.y / 32);
+					if (!g->isObstacle(coord.x / coord_pixel, coord.y / coord_pixel)) {
+						g->setObstacle(coord.x / coord_pixel, coord.y / coord_pixel);
 					}
 					else {
-						g->resetObstacle(coord.x / 32, coord.y / 32);
+						g->resetObstacle(coord.x / coord_pixel, coord.y / coord_pixel);
 					}
 
-					path = g->findShortestPathAstar(x, y, x1, y1, temp);
+					path = g->findShortestPathAstar(x, y, x1, y1, directions);
 
-					if (path.size() != 0) {
-						if (!map.load(tile_path, sf::Vector2u(32, 32), path, 16, 16))
-							std::cout << "Map can not be loaded!" << std::endl;
-					}
-					else {
-						std::cout << "No path exists between source and destination coordinates!" << std::endl;
-
-						g->resetObstacle(coord.x / 32, coord.y / 32);
+					if (!map.update(path)) {
+						std::cout << "No path exists!" << std::endl;
+						g->resetObstacle(coord.x / coord_pixel, coord.y / coord_pixel);
 					}
 
 				}
@@ -78,47 +70,38 @@ int main() {
 			// right click (set new destination)
 			if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Right) {
 				sf::Vector2i coord = sf::Mouse::getPosition(window);
-				if (!g->isObstacle(coord.x / 32, coord.y / 32)) {
+				if (!g->isObstacle(coord.x / coord_pixel, coord.y / coord_pixel)) {
 
-					x = x1;
-					y = y1;
+					x = x1;	y = y1;
+					x1 = coord.x / coord_pixel;
+					y1 = coord.y / coord_pixel;
 
-					x1 = coord.x / 32;
-					y1 = coord.y / 32;
+					path = g->findShortestPathAstar(x, y, x1, y1, directions);
+					walker->setPath(Util::nodeToVec(*directions));
 
-						
-					path = g->findShortestPathAstar(x, y, x1, y1, temp);
-					walker->setPath(nodeToVec(*temp));
-
-					if (path.size() != 0) {
-						if (!map.load(tile_path, sf::Vector2u(32, 32), path, 16, 16))
-							std::cout << "Map can not be loaded!" << std::endl;
-					}
-					else {
-						std::cout << "No path exists between source and destination coordinates!" << std::endl;
-					}
+					if (!map.update(path)) std::cout << "No path exists!" << std::endl;
 				}
 					
-				std::reverse(temp->begin(), temp->end());
+				std::reverse(directions->begin(), directions->end());
 
-				for (size_t i = 0; i < temp->size(); i++) {
+				for (size_t i = 0; i < directions->size(); i++) {
 					if (i % 16 == 0) { std::cout << std::endl; }
-					std::cout << "(" << temp->at(i)->getX() << ", " << temp->at(i)->getY() << ")";
+					std::cout << "(" << directions->at(i)->getX() << ", " << directions->at(i)->getY() << ")";
 				}				
 			}
 		}
 
+		// clear old directions
+		directions->clear();
+		directions->shrink_to_fit();
 		
-		temp->clear();
-		temp->shrink_to_fit();
-		
-		walker->move(0.08f);
+		// move the walker 
+		walker->move(fixed_time);
 
 		// clear the window with black color
 		window.clear(sf::Color::Black);
 
 		// draw everything here...
-		// window.draw(...);
 		window.draw(map);
 		walker->draw(window, sf::RenderStates::Default);
 
@@ -127,19 +110,4 @@ int main() {
 	}
 
 	return 0;
-}
-
-std::vector<sf::Vector2f> nodeToVec(std::vector<Node*> n) {
-	std::vector<sf::Vector2f> tmp;
-	sf::Vector2f vec;
-	for (size_t i = 0; i < n.size(); i++) {
-		vec.x = n[i]->getX() * 32;
-		vec.y = n[i]->getY() * 32;
-
-		tmp.push_back(vec);
-
-		//std::cout << std::endl << tmp[i].x << ", " << tmp[i].y << std::endl;
-	}
-
-	return tmp;
 }

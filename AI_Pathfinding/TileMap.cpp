@@ -1,6 +1,10 @@
 #include "TileMap.h"
 #include <iostream>
 
+TileMap::TileMap() {
+	tile_path = "tilea2.png";
+}
+
 bool TileMap::load(const std::string& tileset, sf::Vector2u tileSize, std::vector<int> tiles, unsigned int width, unsigned int height)
 {
 	// load the tileset texture
@@ -39,6 +43,19 @@ bool TileMap::load(const std::string& tileset, sf::Vector2u tileSize, std::vecto
 	}
 
 	return true;
+}
+
+bool TileMap::update(std::vector<int> path) {
+	if (path.size() != 0) {
+		if (!load(tile_path, sf::Vector2u(32, 32), path, 16, 16)) {
+			std::cout << "Map can not be loaded!" << std::endl;
+			return false;
+		}
+		return true;
+	}
+	else {
+		return false;
+	}
 }
 
 void TileMap::draw(sf::RenderTarget& target, sf::RenderStates states) const
