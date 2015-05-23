@@ -1,5 +1,5 @@
 #pragma once
-#include "Node.h"
+#include "..\struct\Node.h"
 #include <SFML\Graphics\Vertex.hpp>
 #include <cmath>
 #include <vector>

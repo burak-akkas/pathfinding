@@ -1,7 +1,7 @@
 #pragma once
-#include "Graph.h"
-#include "TileMap.h"
-#include "Walker.h"
+#include "struct\Graph.h"
+#include "struct\TileMap.h"
+#include "object\Walker.h"
 #include <algorithm>
 
 const float fixed_time = 0.08f;

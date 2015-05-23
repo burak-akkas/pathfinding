@@ -27,7 +27,7 @@ Walker::Walker(float x, float y) {
 }
 
 void Walker::load() {
-	if (texture.loadFromFile("Player.png", sf::IntRect(32, 48, 32, 48))) {
+	if (texture.loadFromFile("./graphics/Player.png", sf::IntRect(32, 48, 32, 48))) {
 		sprite.setTexture(texture);
 	}
 }

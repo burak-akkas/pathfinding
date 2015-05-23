@@ -2,7 +2,7 @@
 #include <iostream>
 
 TileMap::TileMap() {
-	tile_path = "tilea2.png";
+	tile_path = "./graphics/tilea2.png";
 }
 
 bool TileMap::load(const std::string& tileset, sf::Vector2u tileSize, std::vector<int> tiles, unsigned int width, unsigned int height)
