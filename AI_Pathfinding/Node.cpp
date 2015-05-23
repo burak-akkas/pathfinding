@@ -74,6 +74,10 @@ void Node::setObstacle() {
 	obstacle = true;
 }
 
+void Node::resetObstacle() {
+	obstacle = false;
+}
+
 bool Node::isObstacle() {
 	return obstacle;
 }

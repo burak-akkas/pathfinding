@@ -1,84 +1,133 @@
 #include "Graph.h"
 #include "TileMap.h"
+#include <algorithm>
+
+sf::Vector2f normalize(const sf::Vector2f& source);
 
 int main() {
 	Graph *g = new Graph(16);
-
-	/*g->setObstacle(1, 1);
-	g->setObstacle(1, 2);
-	g->setObstacle(1, 3);
-	g->setObstacle(1, 4);
-	g->setObstacle(1, 5);
-	g-
-	>setObstacle(1, 6);
-	g->setObstacle(1, 0);
-	g->setObstacle(5, 6);
-	g->setObstacle(3, 2);
-	g->setObstacle(6, 1);
-	g->setObstacle(6, 3);
-	g->setObstacle(6, 4);
-	g->setObstacle(5, 4);
-	g->setObstacle(5, 3);
-	*/
-	srand(time(NULL));
-
-	for (int i = 0; i < 50; i++) {
-		g->setObstacle(rand() % 15 + 1, rand() % 15 + 1);
-	}
+	Graph *prev = new Graph(16);
+	std::vector<int> path;
+	std::vector<Node*> *temp = new std::vector<Node*>;
 
 	int x, y, x1, y1;
 
-	std::cout << "Enter start x, y: ";
-	std::cin >> x >> y;
-
-	std::cout << "Enter end x, y: ";
-	std::cin >> x1 >> y1;
-
-	//g->printGraph();
+	x = 8;
+	y = 8;
+	x1 = 8;
+	y1 = 8;
 
 	// create the window
-	sf::RenderWindow window(sf::VideoMode(512, 512), "TileMap");
+	sf::RenderWindow window(sf::VideoMode(512, 512), "Pathfinding");
+
+	window.setVerticalSyncEnabled(true);
+	window.setFramerateLimit(20);
 
 	// create the tilemap from the level definition
 	TileMap map;
-	if (!map.load("tilea3.png", sf::Vector2u(32, 32), g->findShortestPathAstar(y, x, y1, x1), 16, 16))
+	if (!map.load("tilea3.png", sf::Vector2u(32, 32), g->emptyPath(x, y), 16, 16))
 		return -1;
-	// run the main loop
 
+	// run the main loop
 	// run the program as long as the window is open
 	while (window.isOpen())
 	{
 		// check all the window's events that were triggered since the last iteration of the loop
 		sf::Event event;
-		while (window.pollEvent(event))
-		{
-			// "close requested" event: we close the window
-			if (event.type == sf::Event::Closed)
-				window.close();
-			// mouse events
-			if (event.type == sf::Event::MouseButtonPressed) {
-				sf::Vector2i coord = sf::Mouse::getPosition(window);
+			while (window.pollEvent(event))
+			{
 
-				g->setObstacle(coord.x % 16, coord.y % 16);
-				std::cout << coord.x << "," << coord.y << std::endl;
-				
-				window.draw(map);
+				// "close requested" event: we close the window
+				if (event.type == sf::Event::Closed) {
+					window.close();
+				}
+
+				// mouse events
+				// left click (add obstacle)
+				if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left) {
+					sf::Vector2i coord = sf::Mouse::getPosition(window);
+
+					if ((coord.x / 32 != x1 || coord.y / 32 != y1)) {
+
+						if (!g->isObstacle(coord.x / 32, coord.y / 32)) {
+							g->setObstacle(coord.x / 32, coord.y / 32);
+						}
+						else {
+							g->resetObstacle(coord.x / 32, coord.y / 32);
+						}
+
+						path = g->findShortestPathAstar(x, y, x1, y1, temp);
+
+						if (path.size() != 0) {
+							if (!map.load("tilea3.png", sf::Vector2u(32, 32), path, 16, 16))
+								std::cout << "Map can not be loaded!" << std::endl;
+						}
+						else {
+							std::cout << "No path exists between source and destination coordinates!" << std::endl;
+
+							g->resetObstacle(coord.x / 32, coord.y / 32);
+						}
+
+					}
+				}
+				// right click (set new destination)
+				if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Right) {
+					sf::Vector2i coord = sf::Mouse::getPosition(window);
+
+					if (!g->isObstacle(coord.x / 32, coord.y / 32)) {
+
+						x = x1;
+						y = y1;
+
+						x1 = coord.x / 32;
+						y1 = coord.y / 32;
+
+						
+						path = g->findShortestPathAstar(x, y, x1, y1, temp);
+
+						if (path.size() != 0) {
+							if (!map.load("tilea3.png", sf::Vector2u(32, 32), path, 16, 16))
+								std::cout << "Map can not be loaded!" << std::endl;
+						}
+						else {
+							std::cout << "No path exists between source and destination coordinates!" << std::endl;
+						}
+					}
+					
+					std::reverse(temp->begin(), temp->end());
+
+					for (size_t i = 0; i < temp->size(); i++) {
+						if (i % 16 == 0) { std::cout << std::endl; }
+						std::cout << "(" << temp->at(i)->getX() << ", " << temp->at(i)->getY() << ")";
+					}
+							
+				}
 			}
+
+
+			temp->clear();
+			temp->shrink_to_fit();
+
+			// clear the window with black color
+			window.clear(sf::Color::Black);
+
+			// draw everything here...
+			// window.draw(...);
+			window.draw(map);
+			//window.draw(playerImage);
+
+			// end the current frame
+			window.display();
 		}
 
-		// clear the window with black color
-		window.clear(sf::Color::Black);
-
-		// draw everything here...
-		// window.draw(...);
-		window.draw(map);
-
-		// end the current frame
-		window.display();
-	}
-
-
-	std::cin.get();
-
 	return 0;
+}
+
+sf::Vector2f normalize(const sf::Vector2f& source)
+{
+	float length = sqrt((source.x * source.x) + (source.y * source.y));
+	if (length != 0)
+		return sf::Vector2f(source.x / length, source.y / length);
+	else
+		return source;
 }

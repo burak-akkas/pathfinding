@@ -20,6 +20,7 @@ public:
 	void setParent(Node* n);
 	void setObstacle();
 	bool isObstacle();
+	void resetObstacle();
 
 	void setGScore(int score);
 	int getGScore();

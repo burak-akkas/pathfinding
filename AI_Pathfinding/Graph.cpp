@@ -10,6 +10,11 @@ Graph::Graph(int s) {
 	initGrid();
 }
 
+Graph::~Graph() {
+	grid.clear();
+	grid.shrink_to_fit();
+}
+
 void Graph::initGrid() {
 	for (int y = 0; y < size; y++) {
 		std::vector<Node*> tmp;
@@ -39,9 +44,17 @@ void Graph::setObstacle(int x, int y) {
 	grid.at(y).at(x)->setObstacle();
 }
 
-std::vector<int> Graph::findShortestPathAstar(int start_x, int start_y, int finish_x, int finish_y) {
+void Graph::resetObstacle(int x, int y) {
+	grid.at(y).at(x)->resetObstacle();
+}
 
-	std::vector<Node*> path;
+bool Graph::isObstacle(int x, int y) {
+	return grid.at(y).at(x)->isObstacle();
+}
+
+std::vector<int> Graph::findShortestPathAstar(int start_x, int start_y, int finish_x, int finish_y, std::vector<Node*> *path) {
+
+	//std::vector<Node*> path;
 
 	Node *start = grid[start_y][start_x];
 	Node *end = grid[finish_y][finish_x];
@@ -131,22 +144,27 @@ std::vector<int> Graph::findShortestPathAstar(int start_x, int start_y, int fini
 
 		n++;
 
-		if (n >= 100) { std::vector<int> t; return t; }
+		if (n >= 100) { 
+			std::vector<int> t; 
+			std::cout << "Tried 100 times to find a path!" << std::endl; 
+			resetNodes();
+			return t; 
+		}
 	}
 
 	while (current->hasParent() && !current->equals(start))
 	{
-		path.push_back(current);
+		path->push_back(current);
 		current = current->getParent();
 	}
 
-	// print path
-	//printPath(path, start, end);
 
-	// for testing
-	//for (size_t i = 0; i < path.size(); i++) {
-	//	std::cout << path[i]->toString() << "\n";
-	//}
+	/*for (size_t i = 0; i < path.size(); i++) {
+		if (i % 16 == 0) { std::cout << std::endl; }
+		std::cout << "(" << path[i]->getX() << ", " << path[i]->getY() << ")";
+	}*/
+
+	resetNodes();
 
 	return printPath(path, start, end);
 }
@@ -161,35 +179,72 @@ void Graph::printGraph() {
 	}
 }
 
-std::vector<int> Graph::printPath(std::vector<Node*> path, Node* start, Node* finish) {
-	std::vector<int> t;	t.push_back(0);
+std::vector<int> Graph::printPath(std::vector<Node*> *path, Node* start, Node* finish) {
+	std::vector<int> t;
 
 	for (int y = 0; y < size; y++) {
 		for (int x = 0; x < size; x++) {
 			if (grid.at(y).at(x)->isObstacle()) {
-				std::cout << "X ";
+				//std::cout << "X ";
 				t.push_back(1);
 			}
 			else if (grid.at(y).at(x)->equals(start)) {
-				std::cout << "S ";
+				//std::cout << "S ";
 				t.push_back(4);
 			}
 			else if (grid.at(y).at(x)->equals(finish)) {
-				std::cout << "F ";
+				//std::cout << "F ";
 				t.push_back(6);
 			}
-			else if (search(grid.at(y).at(x), path)) {
-				std::cout << "* ";
+			else if (search(grid.at(y).at(x), *path)) {
+				//std::cout << "* ";
 				t.push_back(2);
 			}
 			else {
-				std::cout << "0 ";
+				//std::cout << "0 ";
 				t.push_back(0);
 			}
 		}
 
-		std::cout << std::endl;
+		//std::cout << std::endl;
+	}
+
+	/*std::cout << t.size() << std::endl;
+	for (size_t i = 0; i < t.size(); ++i) {
+		std::cout << t.at(i);
+	}*/
+
+	return t;
+}
+
+std::vector<int> Graph::emptyPath(int x, int y) {
+	std::vector<int> t;
+
+	Node *start = new Node(x, y);
+
+	for (int y = 0; y < size; y++) {
+		for (int x = 0; x < size; x++) {
+			if (grid.at(y).at(x)->isObstacle()) {
+				t.push_back(1);
+			}
+			else if (grid.at(y).at(x)->equals(start)) {
+				t.push_back(4);
+			}
+			else {
+				t.push_back(0);
+			}
+		}
 	}
 
 	return t;
+}
+
+void Graph::resetNodes() {
+	// clear opened, closed states of nodes
+	for (size_t i = 0; i < grid.size(); i++) {
+		for (size_t j = 0; j < grid.at(i).size(); j++) {
+			grid.at(i).at(j)->closed = false;
+			grid.at(i).at(j)->opened = false;
+		}
+	}
 }
