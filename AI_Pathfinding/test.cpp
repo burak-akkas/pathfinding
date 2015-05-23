@@ -3,13 +3,15 @@
 #include "TileMap.h"
 #include "Walker.h"
 #include <algorithm>
+#include <string>
 
 std::vector<sf::Vector2f> nodeToVec(std::vector<Node*> n);
+const std::string tile_path = "tilea2.png";
 
 int main() {
 	Graph *g = new Graph(16);
 	Graph *prev = new Graph(16);
-	Walker *walker = new Walker(8 * 32, 8 * 32, 15);
+	Walker *walker = new Walker(8 * 32, 8 * 32);
 	std::vector<int> path;
 	std::vector<Node*> *temp = new std::vector<Node*>;
 
@@ -25,10 +27,10 @@ int main() {
 
 	window.setVerticalSyncEnabled(true);
 	window.setFramerateLimit(20);
-
+	
 	// create the tilemap from the level definition
 	TileMap map;
-	if (!map.load("tilea3.png", sf::Vector2u(32, 32), g->emptyPath(x, y), 16, 16))
+	if (!map.load(tile_path, sf::Vector2u(32, 32), g->emptyPath(x, y), 16, 16))
 		return -1;
 
 	// run the main loop
@@ -62,7 +64,7 @@ int main() {
 					path = g->findShortestPathAstar(x, y, x1, y1, temp);
 
 					if (path.size() != 0) {
-						if (!map.load("tilea3.png", sf::Vector2u(32, 32), path, 16, 16))
+						if (!map.load(tile_path, sf::Vector2u(32, 32), path, 16, 16))
 							std::cout << "Map can not be loaded!" << std::endl;
 					}
 					else {
@@ -89,7 +91,7 @@ int main() {
 					walker->setPath(nodeToVec(*temp));
 
 					if (path.size() != 0) {
-						if (!map.load("tilea3.png", sf::Vector2u(32, 32), path, 16, 16))
+						if (!map.load(tile_path, sf::Vector2u(32, 32), path, 16, 16))
 							std::cout << "Map can not be loaded!" << std::endl;
 					}
 					else {
@@ -110,7 +112,7 @@ int main() {
 		temp->clear();
 		temp->shrink_to_fit();
 		
-		walker->move(0.1f);
+		walker->move(0.08f);
 
 		// clear the window with black color
 		window.clear(sf::Color::Black);
@@ -118,13 +120,10 @@ int main() {
 		// draw everything here...
 		// window.draw(...);
 		window.draw(map);
-		//window.draw(playerImage);
 		walker->draw(window, sf::RenderStates::Default);
 
 		// end the current frame
 		window.display();
-
-		
 	}
 
 	return 0;
@@ -139,7 +138,7 @@ std::vector<sf::Vector2f> nodeToVec(std::vector<Node*> n) {
 
 		tmp.push_back(vec);
 
-		std::cout << std::endl << tmp[i].x << ", " << tmp[i].y << std::endl;
+		//std::cout << std::endl << tmp[i].x << ", " << tmp[i].y << std::endl;
 	}
 
 	return tmp;

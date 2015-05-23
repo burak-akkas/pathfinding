@@ -1,33 +1,38 @@
 #include "Walker.h"
 
-sf::CircleShape Walker::circle(15);
 sf::Vector2f normalize(const sf::Vector2f& source);
 float distance(sf::Vector2f p1, sf::Vector2f p2);
 
 Walker::Walker() {
 	speed = 100.f;
-	
-	position.x = 8.f * 32;
-	position.y = 8.f * 32;
 
-	circle.setFillColor(sf::Color(0, 0, 0));
-	circle.setPosition(position.x, position.y);
-	
+	position.x = 8.f * 32;
+	position.y = 8.f * 32 - 24;
+
+	// sprite prop
+	load();
+	sprite.setPosition(position);
+
 	canMove = false;
 }
 
-Walker::Walker(float x, float y, float s) {
+Walker::Walker(float x, float y) {
 	speed = 100.f;
 
 	position.x = x;
-	position.y = y;
+	position.y = y - 24;
 
-	circle.setFillColor(sf::Color(0, 0, 0));
-	circle.setPosition(position.x, position.y);
-
-	circle.setRadius(s);
+	// sprite prop
+	load();
+	sprite.setPosition(position);
 
 	canMove = false;
+}
+
+void Walker::load() {
+	if (texture.loadFromFile("Player.png", sf::IntRect(32, 48, 32, 48))) {
+		sprite.setTexture(texture);
+	}
 }
 
 void Walker::move(float time) {
@@ -36,18 +41,16 @@ void Walker::move(float time) {
 		if (distance(position, destination) > 5.f)
 		{
 			position += direction * speed * time;
-			circle.setPosition(position);
+			sprite.setPosition(position.x, position.y - 24);
 		}
 		else if (path.size() > 0)
 		{
 			setDestination(&path.back());
 			path.pop_back();
 		}
-		//if (path.size() == 0 && distance(position, destination) < 10.f)
 		else
 		{
 			canMove = false;
-			//circle.setPosition(destination);
 		}
 	}
 }
@@ -74,19 +77,23 @@ void Walker::setPosition(float x, float y) {
 	position.x = x;
 	position.y = y;
 
-	circle.setPosition(position.x, position.y);
+	sprite.setPosition(position.x, position.y);
 }
 
 float Walker::getX() {
-	return circle.getPosition().x;
+	return sprite.getPosition().x;
 }
 
 float Walker::getY() {
-	return circle.getPosition().y;
+	return sprite.getPosition().y;
 }
 
 sf::Vector2f Walker::getPosition() {
-	return circle.getPosition();
+	return sprite.getPosition();
+}
+
+sf::Sprite Walker::getSprite() {
+	return sprite;
 }
 
 bool Walker::isCanMove() {
@@ -115,8 +122,8 @@ void Walker::draw(sf::RenderTarget& target, sf::RenderStates states) const
 	states.transform *= getTransform();
 
 	// apply the tileset texture
-	states.texture = circle.getTexture();
+	states.texture = sprite.getTexture();
 
 	// draw the vertex array
-	target.draw(circle, states);
+	target.draw(sprite, states);
 }

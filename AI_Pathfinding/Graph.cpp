@@ -54,8 +54,6 @@ bool Graph::isObstacle(int x, int y) {
 
 std::vector<int> Graph::findShortestPathAstar(int start_x, int start_y, int finish_x, int finish_y, std::vector<Node*> *path) {
 
-	//std::vector<Node*> path;
-
 	Node *start = grid[start_y][start_x];
 	Node *end = grid[finish_y][finish_x];
 	Node *current = NULL;
@@ -186,19 +184,19 @@ std::vector<int> Graph::printPath(std::vector<Node*> *path, Node* start, Node* f
 		for (int x = 0; x < size; x++) {
 			if (grid.at(y).at(x)->isObstacle()) {
 				//std::cout << "X ";
-				t.push_back(1);
+				t.push_back(100);
 			}
 			else if (grid.at(y).at(x)->equals(start)) {
 				//std::cout << "S ";
-				t.push_back(4);
+				t.push_back(0);
 			}
 			else if (grid.at(y).at(x)->equals(finish)) {
 				//std::cout << "F ";
-				t.push_back(6);
+				t.push_back(0);
 			}
 			else if (search(grid.at(y).at(x), *path)) {
 				//std::cout << "* ";
-				t.push_back(2);
+				t.push_back(0);
 			}
 			else {
 				//std::cout << "0 ";
