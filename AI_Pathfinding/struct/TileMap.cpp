@@ -2,14 +2,14 @@
 
 TileMap::TileMap() {
 	tile_path = "./graphics/tilea2.png";
+	// load the tileset texture
+	m_tileset.loadFromFile(tile_path);
+	tileSize.x = 32; tileSize.y = 32;
+	width = 16; height = 16;
 }
 
-bool TileMap::load(const std::string& tileset, sf::Vector2u tileSize, std::vector<int> tiles, unsigned int width, unsigned int height)
+bool TileMap::load(std::vector<int> tiles)
 {
-	// load the tileset texture
-	if (!m_tileset.loadFromFile(tileset))
-		return false;
-
 	// resize the vertex array to fit the level size
 	m_vertices.setPrimitiveType(sf::Quads);
 	m_vertices.resize(width * height * 4);
@@ -46,8 +46,7 @@ bool TileMap::load(const std::string& tileset, sf::Vector2u tileSize, std::vecto
 
 bool TileMap::update(std::vector<int> path) {
 	if (path.size() != 0) {
-		if (!load(tile_path, sf::Vector2u(32, 32), path, 16, 16)) {
-			//std::cout << "Map can not be loaded!" << std::endl;
+		if (!load(path)) {
 			return false;
 		}
 		return true;

@@ -283,7 +283,6 @@ std::vector<Animation> Walker::loadAnimations() {
 	walkingAnimationUpRight.addFrame(sf::IntRect(96, 224, 32, 32));
 	walkingAnimationUpRight.addFrame(sf::IntRect(128, 224, 32, 32));
 	walkingAnimationUpRight.addFrame(sf::IntRect(160, 224, 32, 32));
-	//Animation* currentAnimation = &walkingAnimationLeft;
 
 	std::vector<Animation> anims;
 	anims.push_back(walkingAnimationDown);

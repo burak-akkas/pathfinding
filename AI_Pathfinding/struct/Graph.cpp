@@ -205,7 +205,7 @@ std::vector<int> Graph::emptyPath() {
 	for (int y = 0; y < size; y++) {
 		for (int x = 0; x < size; x++) {
 			if (grid.at(y).at(x)->isObstacle()) {
-				t.push_back(1);
+				t.push_back(54);
 			}
 			else {
 				t.push_back(0);

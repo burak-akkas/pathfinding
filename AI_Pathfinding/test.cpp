@@ -4,8 +4,7 @@
 #include "object\Walker.h"
 #include <algorithm>
 
-const float fixed_time = 0.08f;
-const int frame_limit = 20;
+const int frame_limit = 60;
 const int screen_height = 512, screen_width = 512;
 const int graph_size = 16;
 const int coord_pixel = screen_height / graph_size;
@@ -14,10 +13,10 @@ const std::string window_title = "Pathfinding";
 int main() {
 	Graph *g = new Graph(graph_size);
 	TileMap map;
-	std::vector<int> path;
-	std::vector<Node*> *directions = new std::vector<Node*>;
+	std::vector<Node*> directions;
 
 	int x = 8, y = 8, x1 = 8, y1 = 8;
+	int mouse_x = 0, mouse_y = 0;
 
 	// create the window
 	sf::RenderWindow window(sf::VideoMode(screen_width, screen_height), window_title);
@@ -55,37 +54,46 @@ int main() {
 			if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left) {
 				sf::Vector2i coord = sf::Mouse::getPosition(window);
 
-				if ((coord.x / coord_pixel != x1 || coord.y / coord_pixel != y1)) {
+				mouse_x = coord.x / coord_pixel;
+				mouse_y = coord.y / coord_pixel;
 
-					if (!g->isObstacle(coord.x / coord_pixel, coord.y / coord_pixel)) {
-						g->setObstacle(coord.x / coord_pixel, coord.y / coord_pixel);
+				if ((mouse_x != x1 || mouse_y != y1)) {
+
+					if (!g->isObstacle(mouse_x, mouse_y)) {
+						g->setObstacle(mouse_x, mouse_y);
 					}
 					else {
-						g->resetObstacle(coord.x / coord_pixel, coord.y / coord_pixel);
+						g->resetObstacle(mouse_x, mouse_y);
 					}
+				}
 
-					path = g->findShortestPathAstar(x, y, x1, y1, directions);
-
-					if (!map.update(path)) {
-						std::cout << "No path exists!" << std::endl;
-						g->resetObstacle(coord.x / coord_pixel, coord.y / coord_pixel);
-					}
-
+				if (!map.update(g->emptyPath())) {
+					//std::cout << "(left)No path exists!" << std::endl;
 				}
 			}
 			// right click (set new destination)
 			if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Right) {
 				sf::Vector2i coord = sf::Mouse::getPosition(window);
-				if (!g->isObstacle(coord.x / coord_pixel, coord.y / coord_pixel)) {
+
+				mouse_x = coord.x / coord_pixel;
+				mouse_y = coord.y / coord_pixel;
+
+				if (walker.isCanMove() == false)
+				if (!g->isObstacle(mouse_x, mouse_y)) {
+					sf::Vector2i backup(x, y), backup2(x1, y1);
 
 					x = x1;	y = y1;
-					x1 = coord.x / coord_pixel;
-					y1 = coord.y / coord_pixel;
+					x1 = mouse_x;
+					y1 = mouse_y;
 
-					path = g->findShortestPathAstar(x, y, x1, y1, directions);
-					walker.setPath(Util::nodeToVec(*directions));
-
-					if (!map.update(path)) std::cout << "No path exists!" << std::endl;
+					if (!map.update(g->findShortestPathAstar(x, y, x1, y1, &directions))) {
+						std::cout << "No path exists!" << std::endl;
+						x = backup.x; y = backup.y;
+						x1 = backup2.x; y1 = backup2.y;
+					}
+					else {
+						walker.setPath(Util::nodeToVec(directions));
+					}
 				}
 			}
 		}
@@ -94,8 +102,8 @@ int main() {
 		walker.play(anims.at(walker.whereToMove()));
 
 		// clear old directions
-		directions->clear();
-		directions->shrink_to_fit();
+		directions.clear();
+		directions.shrink_to_fit();
 
 		walker.move(frameTime.asSeconds());
 
