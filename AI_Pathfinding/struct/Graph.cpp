@@ -173,7 +173,7 @@ std::vector<int> Graph::printPath(std::vector<Node*> *path, Node* start, Node* f
 		for (int x = 0; x < size; x++) {
 			if (grid.at(y).at(x)->isObstacle()) {
 				//std::cout << "X ";
-				t.push_back(100);
+				t.push_back(54);
 			}
 			else if (grid.at(y).at(x)->equals(start)) {
 				//std::cout << "S ";
@@ -199,18 +199,13 @@ std::vector<int> Graph::printPath(std::vector<Node*> *path, Node* start, Node* f
 	return t;
 }
 
-std::vector<int> Graph::emptyPath(int x, int y) {
+std::vector<int> Graph::emptyPath() {
 	std::vector<int> t;
-
-	Node *start = new Node(x, y);
 
 	for (int y = 0; y < size; y++) {
 		for (int x = 0; x < size; x++) {
 			if (grid.at(y).at(x)->isObstacle()) {
 				t.push_back(1);
-			}
-			else if (grid.at(y).at(x)->equals(start)) {
-				t.push_back(4);
 			}
 			else {
 				t.push_back(0);

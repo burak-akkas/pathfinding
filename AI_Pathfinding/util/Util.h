@@ -1,4 +1,5 @@
-#pragma once
+#ifndef UTIL_INCLUDE
+#define UTIL_INCLUDE
 #include "..\struct\Node.h"
 #include <SFML\Graphics\Vertex.hpp>
 #include <cmath>
@@ -10,3 +11,5 @@ class Util {
 		static sf::Vector2f normalize(const sf::Vector2f& source);
 		static std::vector<sf::Vector2f> nodeToVec(std::vector<Node*> n);
 };
+
+#endif

@@ -1,4 +1,5 @@
-#pragma once
+#ifndef NODE_INCLUDE
+#define NODE_INCLUDE
 #include <string>
 
 class Node {
@@ -39,3 +40,5 @@ public:
 	bool equals(Node *n);
 	std::string toString();
 };
+
+#endif

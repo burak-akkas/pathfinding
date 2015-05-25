@@ -1,4 +1,5 @@
-#pragma once
+#ifndef GRAPH_INCLUDE
+#define GRAPH_INCLUDE
 #include <iostream>
 #include <vector>
 #include <map>
@@ -10,7 +11,6 @@ private:
 	int size;
 	std::vector< std::vector<Node*> > grid;
 	void initGrid();
-	//int heuristic(Node *current, Node *target);
 	bool search(Node* n, std::vector<Node*> path);
 public:
 	Graph();
@@ -24,5 +24,7 @@ public:
 	std::vector<int> findShortestPathAstar(int start_x, int start_y, int finish_x, int finish_y, std::vector<Node*> *path);
 	void printGraph();
 	std::vector<int> printPath(std::vector<Node*> *path, Node* start, Node* finish);
-	std::vector<int> emptyPath(int x, int y);
+	std::vector<int> emptyPath();
 };
+
+#endif

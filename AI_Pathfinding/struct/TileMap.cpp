@@ -1,5 +1,4 @@
 #include "TileMap.h"
-#include <iostream>
 
 TileMap::TileMap() {
 	tile_path = "./graphics/tilea2.png";
@@ -48,7 +47,7 @@ bool TileMap::load(const std::string& tileset, sf::Vector2u tileSize, std::vecto
 bool TileMap::update(std::vector<int> path) {
 	if (path.size() != 0) {
 		if (!load(tile_path, sf::Vector2u(32, 32), path, 16, 16)) {
-			std::cout << "Map can not be loaded!" << std::endl;
+			//std::cout << "Map can not be loaded!" << std::endl;
 			return false;
 		}
 		return true;

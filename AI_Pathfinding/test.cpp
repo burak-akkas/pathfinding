@@ -16,7 +16,6 @@ int main() {
 	TileMap map;
 	std::vector<int> path;
 	std::vector<Node*> *directions = new std::vector<Node*>;
-	Walker *walker = new Walker(8, 8);
 
 	int x = 8, y = 8, x1 = 8, y1 = 8;
 
@@ -26,9 +25,14 @@ int main() {
 	// limit fps
 	window.setVerticalSyncEnabled(true);
 	window.setFramerateLimit(frame_limit);
-	
+
+	Walker walker(sf::seconds(0.2f), true, false, x * coord_pixel, y * coord_pixel);
+	std::vector<Animation> anims = walker.loadAnimations();
+
+	sf::Clock frameClock;
+
 	// create the tilemap from the level definition
-	map.update(g->emptyPath(x, y));
+	map.update(g->emptyPath());
 
 	// run the main loop
 	// run the program as long as the window is open
@@ -38,14 +42,16 @@ int main() {
 		sf::Event event;
 		while (window.pollEvent(event))
 		{
-
 			// "close requested" event: we close the window
 			if (event.type == sf::Event::Closed) {
 				window.close();
 			}
-
+			// "esc pressed" event: close the window
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape)) {
+				window.close();
+			}
 			// mouse events
-			// left click (add obstacle)
+			// left click (add/remove obstacle)
 			if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left) {
 				sf::Vector2i coord = sf::Mouse::getPosition(window);
 
@@ -77,33 +83,34 @@ int main() {
 					y1 = coord.y / coord_pixel;
 
 					path = g->findShortestPathAstar(x, y, x1, y1, directions);
-					walker->setPath(Util::nodeToVec(*directions));
+					walker.setPath(Util::nodeToVec(*directions));
 
 					if (!map.update(path)) std::cout << "No path exists!" << std::endl;
 				}
-					
-				std::reverse(directions->begin(), directions->end());
-
-				for (size_t i = 0; i < directions->size(); i++) {
-					if (i % 16 == 0) { std::cout << std::endl; }
-					std::cout << "(" << directions->at(i)->getX() << ", " << directions->at(i)->getY() << ")";
-				}				
 			}
 		}
+
+		sf::Time frameTime = frameClock.restart();
+		walker.play(anims.at(walker.whereToMove()));
 
 		// clear old directions
 		directions->clear();
 		directions->shrink_to_fit();
-		
-		// move the walker 
-		walker->move(fixed_time);
+
+		walker.move(frameTime.asSeconds());
+
+		if (!walker.isCanMove()) {
+			walker.stop();
+		}
+
+		walker.update(frameTime);
 
 		// clear the window with black color
 		window.clear(sf::Color::Black);
 
 		// draw everything here...
 		window.draw(map);
-		walker->draw(window, sf::RenderStates::Default);
+		window.draw(walker);
 
 		// end the current frame
 		window.display();

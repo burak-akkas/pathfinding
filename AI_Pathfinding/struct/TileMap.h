@@ -1,4 +1,6 @@
-#pragma once
+#ifndef TILEMAP_INCLUDE
+#define TILEMAP_INCLUDE
+
 #include <SFML\Graphics.hpp>
 #include <string>
 
@@ -15,3 +17,5 @@ private:
 
 	virtual void draw(sf::RenderTarget& target, sf::RenderStates states) const;
 };
+
+#endif
