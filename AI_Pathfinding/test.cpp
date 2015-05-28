@@ -28,7 +28,29 @@ int main() {
 	Walker walker(sf::seconds(0.2f), true, false, x * coord_pixel, y * coord_pixel);
 	std::vector<Animation> anims = walker.loadAnimations();
 
+	// fps
 	sf::Clock frameClock;
+
+	// algorithm execute time
+	sf::Clock execClock;
+	bool exec_changed = false;
+
+	// text test
+	sf::Font font;
+	font.loadFromFile("Anke.ttf");
+
+	sf::Text fps_text, exec_text;
+	fps_text.setFont(font);
+	fps_text.setString("FPS: ");
+	fps_text.setCharacterSize(14);
+	fps_text.setColor(sf::Color::White);
+	fps_text.setStyle(sf::Text::Bold);
+	fps_text.setPosition(screen_width - 120, 10);
+
+	exec_text = fps_text;
+	exec_text.setPosition(10, 10);
+	exec_text.setString("");
+	// #text test
 
 	// create the tilemap from the level definition
 	map.update(g->emptyPath());
@@ -68,7 +90,7 @@ int main() {
 				}
 
 				if (!map.update(g->emptyPath())) {
-					//std::cout << "(left)No path exists!" << std::endl;
+
 				}
 			}
 			// right click (set new destination)
@@ -86,12 +108,23 @@ int main() {
 					x1 = mouse_x;
 					y1 = mouse_y;
 
-					if (!map.update(g->findShortestPathAstar(x, y, x1, y1, &directions))) {
+					// restart algorithm execution clock
+					execClock.restart();
+					if (!map.update(g->findShortestPathBFS(x, y, x1, y1, &directions))) {
+					//if (!map.update(g->findShortestPathDijkstra(x, y, x1, y1, &directions))) {
+					//if (!map.update(g->findShortestPathAstar(x, y, x1, y1, &directions))) {
 						std::cout << "No path exists!" << std::endl;
 						x = backup.x; y = backup.y;
 						x1 = backup2.x; y1 = backup2.y;
 					}
 					else {
+						// get algorithm execution time
+						sf::Time execTime = execClock.restart();
+
+						// set text to be drawn
+						exec_text.setString("Exec time: " + std::to_string(execTime.asMilliseconds()) + " ms");
+
+						// set walkers path
 						walker.setPath(Util::nodeToVec(directions));
 					}
 				}
@@ -99,6 +132,7 @@ int main() {
 		}
 
 		sf::Time frameTime = frameClock.restart();
+
 		walker.play(anims.at(walker.whereToMove()));
 
 		// clear old directions
@@ -119,6 +153,13 @@ int main() {
 		// draw everything here...
 		window.draw(map);
 		window.draw(walker);
+
+		// text test
+		fps_text.setString("FPS: " + std::to_string(1.f / frameTime.asSeconds()));
+		window.draw(fps_text);
+		window.draw(exec_text);
+
+		// #text test
 
 		// end the current frame
 		window.display();

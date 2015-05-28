@@ -8,7 +8,7 @@
 
 class Graph {
 private:
-	int size;
+	int size, bound;
 	std::vector< std::vector<Node*> > grid;
 	void initGrid();
 	bool search(Node* n, std::vector<Node*> path);
@@ -22,6 +22,9 @@ public:
 	bool isObstacle(int x, int y);
 	void resetNodes();
 	std::vector<int> findShortestPathAstar(int start_x, int start_y, int finish_x, int finish_y, std::vector<Node*> *path);
+	std::vector<int> Graph::findShortestPathDijkstra(int start_x, int start_y, int finish_x, int finish_y, std::vector<Node*> *path);
+	std::vector<int> Graph::findShortestPathBFS(int start_x, int start_y, int finish_x, int finish_y, std::vector<Node*> *path);
+
 	void printGraph();
 	std::vector<int> printPath(std::vector<Node*> *path, Node* start, Node* finish);
 	std::vector<int> emptyPath();

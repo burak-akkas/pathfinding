@@ -35,7 +35,9 @@ public:
 
 	bool hasParent();
 
-	void computeScores(Node *end);
+	void computeScoresAstar(Node *end);
+	void computeScoresDijkstra();
+	void computeScoresBFS(Node *end);
 
 	bool equals(Node *n);
 	std::string toString();

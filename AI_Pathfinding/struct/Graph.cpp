@@ -2,11 +2,13 @@
 
 Graph::Graph() {
 	size = 0;
+	bound = 1000;
 	initGrid();
 }
 
 Graph::Graph(int s) {
 	size = s;
+	bound = 1000;
 	initGrid();
 }
 
@@ -63,18 +65,14 @@ std::vector<int> Graph::findShortestPathAstar(int start_x, int start_y, int fini
 
 	int n = 0;
 
-	while (current != end && n != 100)
-	{
-		for (i = openList.begin(); i != openList.end(); ++i)
-		{
-			if (i == openList.begin() || (*i)->getFScore() <= current->getFScore())
-			{
+	while (current != end && n != bound) {
+		for (i = openList.begin(); i != openList.end(); ++i) {
+			if (i == openList.begin() || (*i)->getFScore() <= current->getFScore())	{
 				current = (*i);
 			}
 		}
 
-		if (current == end)
-		{
+		if (current == end) {
 			break;
 		}
 
@@ -84,12 +82,9 @@ std::vector<int> Graph::findShortestPathAstar(int start_x, int start_y, int fini
 		closedList.push_back(current);
 		current->closed = true;
 
-		for (int x = -1; x < 2; x++)
-		{
-			for (int y = -1; y < 2; y++)
-			{
-				if (x == 0 && y == 0)
-				{
+		for (int x = -1; x < 2; x++) {
+			for (int y = -1; y < 2; y++) {
+				if (x == 0 && y == 0) {
 					continue;
 				}
 
@@ -99,60 +94,240 @@ std::vector<int> Graph::findShortestPathAstar(int start_x, int start_y, int fini
 
 				child = grid[current->getY() + y][current->getX() + x];
 
-				if (child->closed || child->isObstacle())
-				{
+				if (child->closed || child->isObstacle()) {
 					continue;
 				}
 
-				if (x != 0 && y != 0)
-				{
-					if (grid[current->getY() + y][current->getX()]->isObstacle() || grid[current->getY() + y][current->getX()]->closed)
-					{
+				if (x != 0 && y != 0) {
+					if (grid[current->getY() + y][current->getX()]->isObstacle() || grid[current->getY() + y][current->getX()]->closed) {
 						continue;
 					}
-					if (grid[current->getY()][current->getX() + x]->isObstacle() || grid[current->getY()][current->getX() + x]->closed)
-					{
+					if (grid[current->getY()][current->getX() + x]->isObstacle() || grid[current->getY()][current->getX() + x]->closed) {
 						continue;
 					}
 				}
 
-				if (child->opened)
-				{
-					if (child->getGScore() > child->getGScore(current))
-					{
+				if (child->opened) {
+					if (child->getGScore() > child->getGScore(current)) {
 						child->setParent(current);
-						child->computeScores(end);
+						child->computeScoresAstar(end);
 					}
 				}
-				else
-				{
+				else {
 					openList.push_back(child);
 					child->opened = true;
 
 					child->setParent(current);
-					child->computeScores(end);
+					child->computeScoresAstar(end);
 				}
 			}
 		}
 
 		n++;
 
-		if (n >= 100) { 
+		if (n >= bound) {
 			std::vector<int> t; 
-			std::cout << "Tried 100 times to find a path!" << std::endl; 
+			std::cout << "Tried " << bound << " times to find a path!" << std::endl;
 			resetNodes();
 			return t; 
 		}
 	}
 
-	while (current->hasParent() && !current->equals(start))
-	{
+	while (current->hasParent() && !current->equals(start))	{
 		path->push_back(current);
 		current = current->getParent();
 	}
 
 	resetNodes();
 
+	return printPath(path, start, end);
+}
+
+// example trace of dijksta's algorithm
+// http://jhave.org/algorithms/graphs/Dijkstra/dijkstra.shtml
+std::vector<int> Graph::findShortestPathDijkstra(int start_x, int start_y, int finish_x, int finish_y, std::vector<Node*> *path) {
+
+	Node *start = grid[start_y][start_x];
+	Node *end = grid[finish_y][finish_x];
+	Node *current = NULL;
+	Node *child = NULL;
+
+	std::list<Node*> openList;
+	std::list<Node*>::iterator i;
+
+	openList.push_back(start);
+	start->opened = true;
+
+	int n = 0;
+
+	while (current != end && n != bound) {
+		for (i = openList.begin(); i != openList.end(); ++i) {
+			if (i == openList.begin() || (*i)->getGScore() <= current->getGScore())	{
+				current = (*i);
+			}
+		}
+
+		if (current == end) {
+			break;
+		}
+
+		openList.remove(current);
+		current->opened = false;
+		current->closed = true;
+
+		for (int x = -1; x < 2; x++) {
+			for (int y = -1; y < 2; y++) {
+				if (x == 0 && y == 0) {
+					continue;
+				}
+
+				if (current->getX() + x < 0 || current->getY() + y < 0 || current->getX() + x == size || current->getY() + y == size) {
+					continue;
+				}
+
+				child = grid[current->getY() + y][current->getX() + x];
+
+				if (child->closed || child->isObstacle()) {
+					continue;
+				}
+
+				if (x != 0 && y != 0) {
+					if (grid[current->getY() + y][current->getX()]->isObstacle() || grid[current->getY() + y][current->getX()]->closed) {
+						continue;
+					}
+					if (grid[current->getY()][current->getX() + x]->isObstacle() || grid[current->getY()][current->getX() + x]->closed) {
+						continue;
+					}
+				}
+
+				if (child->opened) {
+					if (child->getGScore() > child->getGScore(current))
+					{
+						child->setParent(current);
+						child->computeScoresDijkstra();
+					}
+				}
+				else {
+					openList.push_back(child);
+					child->opened = true;
+
+					child->setParent(current);
+					child->computeScoresDijkstra();
+				}
+			}
+		}
+
+		n++;
+
+		if (n >= bound) {
+			std::vector<int> t;
+			std::cout << "Tried " << bound << " times to find a path!" << std::endl;
+			resetNodes();
+			return t;
+		}
+	}
+
+	while (current->hasParent() && !current->equals(start)) {
+		path->push_back(current);
+		current = current->getParent();
+	}
+
+	resetNodes();
+
+	return printPath(path, start, end);
+}
+
+// used psuedo-code
+// http://en.wikibooks.org/wiki/Artificial_Intelligence/Search/Heuristic_search/Best-first_search
+std::vector<int> Graph::findShortestPathBFS(int start_x, int start_y, int finish_x, int finish_y, std::vector<Node*> *path) {
+
+	Node *start = grid[start_y][start_x];
+	Node *end = grid[finish_y][finish_x];
+	Node *current = NULL;
+	Node *child = NULL;
+
+	// Define a list, OPEN
+	std::list<Node*> openList;
+	// Define a list, CLOSED
+	std::list<Node*> closedList;
+	std::list<Node*>::iterator i;
+
+	openList.push_back(start);
+	start->opened = true;
+
+	int n = 0;
+
+	while (current != end && n != bound) { // IF bound has been reached, fail
+		for (i = openList.begin(); i != openList.end(); ++i) {
+			if (i == openList.begin() || (*i)->getFScore() <= current->getFScore())	{
+				current = (*i);
+			}
+		}
+
+		// IF any successor to n is the goal node, return success and the solution
+		if (current == end) {
+			break;
+		}
+
+		openList.remove(current);
+		current->opened = false;
+
+		closedList.push_back(current);
+		current->closed = true;
+
+		for (int x = -1; x < 2; x++) {
+			for (int y = -1; y < 2; y++) {
+				if (x == 0 && y == 0) {
+					continue;
+				}
+
+				if (current->getX() + x < 0 || current->getY() + y < 0 || current->getX() + x == size || current->getY() + y == size) {
+					continue;
+				}
+
+				child = grid[current->getY() + y][current->getX() + x];
+
+				if (child->closed || child->isObstacle()) {
+					continue;
+				}
+
+				if (x != 0 && y != 0) {
+					if (grid[current->getY() + y][current->getX()]->isObstacle() || grid[current->getY() + y][current->getX()]->closed) {
+						continue;
+					}
+					if (grid[current->getY()][current->getX() + x]->isObstacle() || grid[current->getY()][current->getX() + x]->closed) {
+						continue;
+					}
+				}
+				if (!child->opened) {
+					openList.push_back(child);
+					child->opened = true;
+
+					child->setParent(current);
+					child->computeScoresBFS(end);
+				}
+			}
+		}
+
+		n++;
+
+		if (n >= bound) {
+			std::vector<int> t;
+			std::cout << "Tried " << bound << " times to find a path!" << std::endl;
+			resetNodes();
+			return t;
+		}
+	} // looping structure by sending the algorithm back to head of the loop
+
+
+	while (current->hasParent() && !current->equals(start))	{
+		path->push_back(current);
+		current = current->getParent();
+	}
+
+	resetNodes();
+
+	// set-up path for rendering
 	return printPath(path, start, end);
 }
 
@@ -172,28 +347,21 @@ std::vector<int> Graph::printPath(std::vector<Node*> *path, Node* start, Node* f
 	for (int y = 0; y < size; y++) {
 		for (int x = 0; x < size; x++) {
 			if (grid.at(y).at(x)->isObstacle()) {
-				//std::cout << "X ";
 				t.push_back(54);
 			}
 			else if (grid.at(y).at(x)->equals(start)) {
-				//std::cout << "S ";
 				t.push_back(0);
 			}
 			else if (grid.at(y).at(x)->equals(finish)) {
-				//std::cout << "F ";
 				t.push_back(0);
 			}
 			else if (search(grid.at(y).at(x), *path)) {
-				//std::cout << "* ";
 				t.push_back(0);
 			}
 			else {
-				//std::cout << "0 ";
 				t.push_back(0);
 			}
 		}
-
-		//std::cout << std::endl;
 	}
 
 	return t;

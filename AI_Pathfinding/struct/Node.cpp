@@ -64,11 +64,24 @@ bool Node::hasParent() {
 	return parent != NULL;
 }
 
-void Node::computeScores(Node *end) {
-	g_score = getGScore(parent);
-	h_score = getHScore(end);
-	f_score = g_score + h_score;
+void Node::computeScoresAstar(Node *end) {
+	g_score = getGScore(parent); // get parent g score
+	h_score = getHScore(end); // get h score from this node to end node
+	f_score = g_score + h_score; // f(v) = h(v) + g(v), h=heuristics, g=dijkstra
 }
+
+void Node::computeScoresDijkstra() { // implemented after A-star
+	h_score = 0; // h(v) = 0 (non informative heuristics function)
+	g_score = getGScore(parent); // get parent g score
+	f_score = g_score; // f(v) = h(v) + g(v), h(v) always will be 0. 
+}
+
+void Node::computeScoresBFS(Node *end) {
+	g_score = 0; // bfs does not depends on g score
+	h_score = getHScore(end); // get h score from this node to end(destination) node
+	f_score = h_score; // f(v) = h(v) + g(v), g(v) always will be 0.
+}
+
 
 void Node::setObstacle() {
 	obstacle = true;
