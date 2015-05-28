@@ -2,24 +2,28 @@
 #include "struct\Graph.h"
 #include "struct\TileMap.h"
 #include "object\Walker.h"
-#include <algorithm>
+#include "ui\TextManager.h"
 
 const int frame_limit = 60;
 const int screen_height = 512, screen_width = 512;
 const int graph_size = 16;
 const int coord_pixel = screen_height / graph_size;
 const std::string window_title = "Pathfinding";
+const int start_pos = 7;
+
+// algorithm switching
+enum Algorithm { A_STAR, BFS, DIJKSTRA };
 
 int main() {
 	Graph *g = new Graph(graph_size);
 	TileMap map;
 	std::vector<Node*> directions;
 
-	int x = 8, y = 8, x1 = 8, y1 = 8;
+	int x = start_pos, y = start_pos, x1 = start_pos, y1 = start_pos;
 	int mouse_x = 0, mouse_y = 0;
 
 	// create the window
-	sf::RenderWindow window(sf::VideoMode(screen_width, screen_height), window_title);
+	sf::RenderWindow window(sf::VideoMode(screen_width, screen_height), window_title, sf::Style::Default);
 
 	// limit fps
 	window.setVerticalSyncEnabled(true);
@@ -28,32 +32,19 @@ int main() {
 	Walker walker(sf::seconds(0.2f), true, false, x * coord_pixel, y * coord_pixel);
 	std::vector<Animation> anims = walker.loadAnimations();
 
+	// textmanager
+	TextManager textManager;
+
 	// fps
 	sf::Clock frameClock;
 
-	// algorithm execute time
-	sf::Clock execClock;
-	bool exec_changed = false;
-
-	// text test
-	sf::Font font;
-	font.loadFromFile("Anke.ttf");
-
-	sf::Text fps_text, exec_text;
-	fps_text.setFont(font);
-	fps_text.setString("FPS: ");
-	fps_text.setCharacterSize(14);
-	fps_text.setColor(sf::Color::White);
-	fps_text.setStyle(sf::Text::Bold);
-	fps_text.setPosition(screen_width - 120, 10);
-
-	exec_text = fps_text;
-	exec_text.setPosition(10, 10);
-	exec_text.setString("");
-	// #text test
+	// test - level from txt
+	g->loadGrid(".\\levels\\level1.txt");
 
 	// create the tilemap from the level definition
 	map.update(g->emptyPath());
+
+	Algorithm selection = A_STAR;
 
 	// run the main loop
 	// run the program as long as the window is open
@@ -63,14 +54,34 @@ int main() {
 		sf::Event event;
 		while (window.pollEvent(event))
 		{
+			// window events
 			// "close requested" event: we close the window
 			if (event.type == sf::Event::Closed) {
 				window.close();
 			}
+
+			// keyboard events
 			// "esc pressed" event: close the window
 			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape)) {
 				window.close();
 			}
+			// algorithm selection
+			// press "A" key for A*
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) {
+				selection = A_STAR;
+			}
+			// press "S" key for BFS
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::S)) {
+				selection = BFS;
+			}
+			// press "D" key for Dijkstra
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
+				selection = DIJKSTRA;
+			}
+
+			// set algorithm display text
+			textManager.setAlgorithmText(selection);
+
 			// mouse events
 			// left click (add/remove obstacle)
 			if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left) {
@@ -90,7 +101,7 @@ int main() {
 				}
 
 				if (!map.update(g->emptyPath())) {
-
+					// error
 				}
 			}
 			// right click (set new destination)
@@ -108,24 +119,49 @@ int main() {
 					x1 = mouse_x;
 					y1 = mouse_y;
 
-					// restart algorithm execution clock
-					execClock.restart();
-					if (!map.update(g->findShortestPathBFS(x, y, x1, y1, &directions))) {
-					//if (!map.update(g->findShortestPathDijkstra(x, y, x1, y1, &directions))) {
-					//if (!map.update(g->findShortestPathAstar(x, y, x1, y1, &directions))) {
-						std::cout << "No path exists!" << std::endl;
-						x = backup.x; y = backup.y;
-						x1 = backup2.x; y1 = backup2.y;
-					}
-					else {
-						// get algorithm execution time
-						sf::Time execTime = execClock.restart();
+					switch (selection) {
+						case 0:
+							if (!map.update(g->findShortestPathAstar(x, y, x1, y1, &directions))) {
+								std::cout << "No path exists!" << std::endl;
+								x = backup.x; y = backup.y;
+								x1 = backup2.x; y1 = backup2.y;
+							}
+							else {
+								// set text to be drawn
+								textManager.setExecText("Exec time: " + std::to_string(g->getExecTime().asMicroseconds()) + " microseconds");
 
-						// set text to be drawn
-						exec_text.setString("Exec time: " + std::to_string(execTime.asMilliseconds()) + " ms");
+								// set walkers path
+								walker.setPath(Util::nodeToVec(directions));
+							}
+							break;
+						case 1:
+							if (!map.update(g->findShortestPathBFS(x, y, x1, y1, &directions))) {
+								std::cout << "No path exists!" << std::endl;
+								x = backup.x; y = backup.y;
+								x1 = backup2.x; y1 = backup2.y;
+							}
+							else {
+								// set text to be drawn
+								textManager.setExecText("Exec time: " + std::to_string(g->getExecTime().asMicroseconds()) + " microseconds");
 
-						// set walkers path
-						walker.setPath(Util::nodeToVec(directions));
+								// set walkers path
+								walker.setPath(Util::nodeToVec(directions));
+							}
+							break;
+						case 2:
+							if (!map.update(g->findShortestPathDijkstra(x, y, x1, y1, &directions))) {
+								std::cout << "No path exists!" << std::endl;
+								x = backup.x; y = backup.y;
+								x1 = backup2.x; y1 = backup2.y;
+							}
+							else {
+								// set text to be drawn
+								textManager.setExecText("Exec time: " + std::to_string(g->getExecTime().asMicroseconds()) + " microseconds");
+
+								// set walkers path
+								walker.setPath(Util::nodeToVec(directions));
+							}
+							break;
 					}
 				}
 			}
@@ -155,10 +191,11 @@ int main() {
 		window.draw(walker);
 
 		// text test
-		fps_text.setString("FPS: " + std::to_string(1.f / frameTime.asSeconds()));
-		window.draw(fps_text);
-		window.draw(exec_text);
-
+		textManager.setFPSText("FPS: " + std::to_string(1.f / frameTime.asSeconds()));
+		window.draw(textManager.getExecText());
+		window.draw(textManager.getFPSText());
+		window.draw(textManager.getInstructionText());
+		window.draw(textManager.getAlgorithmText());
 		// #text test
 
 		// end the current frame

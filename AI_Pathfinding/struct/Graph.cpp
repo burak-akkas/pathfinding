@@ -50,6 +50,8 @@ bool Graph::isObstacle(int x, int y) {
 }
 
 std::vector<int> Graph::findShortestPathAstar(int start_x, int start_y, int finish_x, int finish_y, std::vector<Node*> *path) {
+	sf::Clock execClock;
+	execClock.restart();
 
 	Node *start = grid[start_y][start_x];
 	Node *end = grid[finish_y][finish_x];
@@ -138,6 +140,8 @@ std::vector<int> Graph::findShortestPathAstar(int start_x, int start_y, int fini
 		current = current->getParent();
 	}
 
+	execTime = execClock.getElapsedTime();
+
 	resetNodes();
 
 	return printPath(path, start, end);
@@ -146,6 +150,8 @@ std::vector<int> Graph::findShortestPathAstar(int start_x, int start_y, int fini
 // example trace of dijksta's algorithm
 // http://jhave.org/algorithms/graphs/Dijkstra/dijkstra.shtml
 std::vector<int> Graph::findShortestPathDijkstra(int start_x, int start_y, int finish_x, int finish_y, std::vector<Node*> *path) {
+	sf::Clock execClock;
+	execClock.restart();
 
 	Node *start = grid[start_y][start_x];
 	Node *end = grid[finish_y][finish_x];
@@ -232,6 +238,8 @@ std::vector<int> Graph::findShortestPathDijkstra(int start_x, int start_y, int f
 		current = current->getParent();
 	}
 
+	execTime = execClock.getElapsedTime();
+
 	resetNodes();
 
 	return printPath(path, start, end);
@@ -240,6 +248,8 @@ std::vector<int> Graph::findShortestPathDijkstra(int start_x, int start_y, int f
 // used psuedo-code
 // http://en.wikibooks.org/wiki/Artificial_Intelligence/Search/Heuristic_search/Best-first_search
 std::vector<int> Graph::findShortestPathBFS(int start_x, int start_y, int finish_x, int finish_y, std::vector<Node*> *path) {
+	sf::Clock execClock;
+	execClock.restart();
 
 	Node *start = grid[start_y][start_x];
 	Node *end = grid[finish_y][finish_x];
@@ -325,6 +335,8 @@ std::vector<int> Graph::findShortestPathBFS(int start_x, int start_y, int finish
 		current = current->getParent();
 	}
 
+	execTime = execClock.getElapsedTime();
+
 	resetNodes();
 
 	// set-up path for rendering
@@ -391,5 +403,29 @@ void Graph::resetNodes() {
 			grid.at(i).at(j)->closed = false;
 			grid.at(i).at(j)->opened = false;
 		}
+	}
+}
+
+sf::Time Graph::getExecTime() {
+	return execTime;
+}
+
+void Graph::loadGrid(std::string path) {
+	std::fstream file(path, std::ios_base::in);
+
+	int a;
+
+	for (int j = 0; j < 16; j++)
+	{
+		for (int i = 0; i < 16; i++)
+		{
+			if (file >> a)
+			{
+				if (a == 1) {
+					setObstacle(i, j);
+				}
+			}
+		}
+		if (!file) break;
 	}
 }
