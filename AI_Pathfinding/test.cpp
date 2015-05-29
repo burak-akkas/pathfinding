@@ -3,6 +3,7 @@
 #include "struct\TileMap.h"
 #include "object\Walker.h"
 #include "ui\TextManager.h"
+#include "level\LevelManager.h"
 
 const int frame_limit = 60;
 const int screen_height = 512, screen_width = 512;
@@ -32,14 +33,17 @@ int main() {
 	Walker walker(sf::seconds(0.2f), true, false, x * coord_pixel, y * coord_pixel);
 	std::vector<Animation> anims = walker.loadAnimations();
 
-	// textmanager
+	// text manager
 	TextManager textManager;
+
+	// level manager
+	LevelManager levelManager;
 
 	// fps
 	sf::Clock frameClock;
 
-	// test - level from txt
-	g->loadGrid(".\\levels\\level1.txt");
+	// load first (default) level
+	levelManager.loadLevel(g, 1, x, y);
 
 	// create the tilemap from the level definition
 	map.update(g->emptyPath());
@@ -78,9 +82,32 @@ int main() {
 			if (sf::Keyboard::isKeyPressed(sf::Keyboard::D)) {
 				selection = DIJKSTRA;
 			}
+			// press "1" to load level 1
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num1)) {
+				levelManager.loadLevel(g, 1, x1, y1);
+				map.update(g->emptyPath());
+			}
+			// press "2" to load level 2
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num2)) {
+				levelManager.loadLevel(g, 2, x1, y1);
+				map.update(g->emptyPath());
+			}
+			// press "3" to load level 3
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num3)) {
+				levelManager.loadLevel(g, 3, x1, y1);
+				map.update(g->emptyPath());
+			}
+			// press "4" to load random level
+			if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num4)) {
+				levelManager.loadRandomLevel(g, x1, y1);
+				map.update(g->emptyPath());
+			}
 
 			// set algorithm display text
 			textManager.setAlgorithmText(selection);
+
+			// set level display text
+			textManager.setLevelText(levelManager.getCurrentLevel());
 
 			// mouse events
 			// left click (add/remove obstacle)
@@ -100,9 +127,7 @@ int main() {
 					}
 				}
 
-				if (!map.update(g->emptyPath())) {
-					// error
-				}
+				map.update(g->emptyPath());
 			}
 			// right click (set new destination)
 			if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Right) {
@@ -128,7 +153,7 @@ int main() {
 							}
 							else {
 								// set text to be drawn
-								textManager.setExecText("Exec time: " + std::to_string(g->getExecTime().asMicroseconds()) + " microseconds");
+								textManager.setExecText("Exec time: " + std::to_string(g->getExecTime().asMilliseconds()) + " ms");
 
 								// set walkers path
 								walker.setPath(Util::nodeToVec(directions));
@@ -142,7 +167,7 @@ int main() {
 							}
 							else {
 								// set text to be drawn
-								textManager.setExecText("Exec time: " + std::to_string(g->getExecTime().asMicroseconds()) + " microseconds");
+								textManager.setExecText("Exec time: " + std::to_string(g->getExecTime().asMilliseconds()) + " ms");
 
 								// set walkers path
 								walker.setPath(Util::nodeToVec(directions));
@@ -156,7 +181,7 @@ int main() {
 							}
 							else {
 								// set text to be drawn
-								textManager.setExecText("Exec time: " + std::to_string(g->getExecTime().asMicroseconds()) + " microseconds");
+								textManager.setExecText("Exec time: " + std::to_string(g->getExecTime().asMilliseconds()) + " ms");
 
 								// set walkers path
 								walker.setPath(Util::nodeToVec(directions));
@@ -186,17 +211,16 @@ int main() {
 		// clear the window with black color
 		window.clear(sf::Color::Black);
 
-		// draw everything here...
+		// draw everything
 		window.draw(map);
 		window.draw(walker);
-
-		// text test
 		textManager.setFPSText("FPS: " + std::to_string(1.f / frameTime.asSeconds()));
 		window.draw(textManager.getExecText());
 		window.draw(textManager.getFPSText());
 		window.draw(textManager.getInstructionText());
 		window.draw(textManager.getAlgorithmText());
-		// #text test
+		window.draw(textManager.getLevelText());
+		window.draw(textManager.getLevelInstructionText());
 
 		// end the current frame
 		window.display();

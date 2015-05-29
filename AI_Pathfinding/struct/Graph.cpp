@@ -343,6 +343,11 @@ std::vector<int> Graph::findShortestPathBFS(int start_x, int start_y, int finish
 	return printPath(path, start, end);
 }
 
+std::vector<int> Graph::findShortestPathIDAstar(int start_x, int start_y, int finish_x, int finish_y, std::vector<Node*> *path) {
+	std::vector<int> t;
+	return t;
+}
+
 void Graph::printGraph() {
 	for (int y = 0; y < size; y++) {
 		for (int x = 0; x < size; x++) {
@@ -410,22 +415,6 @@ sf::Time Graph::getExecTime() {
 	return execTime;
 }
 
-void Graph::loadGrid(std::string path) {
-	std::fstream file(path, std::ios_base::in);
-
-	int a;
-
-	for (int j = 0; j < 16; j++)
-	{
-		for (int i = 0; i < 16; i++)
-		{
-			if (file >> a)
-			{
-				if (a == 1) {
-					setObstacle(i, j);
-				}
-			}
-		}
-		if (!file) break;
-	}
+int Graph::getSize() {
+	return size;
 }
