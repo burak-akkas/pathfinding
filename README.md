@@ -9,11 +9,13 @@ http://en.wikipedia.org/wiki/Best-first_search
 A-star, (implemented)
 http://en.wikipedia.org/wiki/A*_search_algorithm
 
-IDA-star,
-http://en.wikipedia.org/wiki/IDA*
-
 Dijkstra's Algorithm, (implemented)
 http://en.wikipedia.org/wiki/Dijkstra%27s_algorithm
+
+Tested under Ubuntu x64 14.10, Mint 17.1 x64, Windows 8.1 x64
+
+For using SFML libraries with Linux, 
+http://www.sfml-dev.org/tutorials/2.0/start-linux.php
 
 Screenshot:
 
