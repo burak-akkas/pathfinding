@@ -1,4 +1,3 @@
-#pragma once
 #include "Walker.h"
 //#include <iostream>
 

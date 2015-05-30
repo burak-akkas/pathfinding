@@ -4,8 +4,8 @@
 #include <iostream>
 #include <vector>
 #include <list>
-#include <SFML\System\Clock.hpp>
-#include <SFML\System\Time.hpp>
+#include <SFML/System/Clock.hpp>
+#include <SFML/System/Time.hpp>
 #include "Node.h"
 
 class Graph {

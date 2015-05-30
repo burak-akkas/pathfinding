@@ -1,7 +1,7 @@
 #ifndef TILEMAP_INCLUDE
 #define TILEMAP_INCLUDE
 
-#include <SFML\Graphics.hpp>
+#include <SFML/Graphics.hpp>
 #include <string>
 
 class TileMap : public sf::Drawable, public sf::Transformable

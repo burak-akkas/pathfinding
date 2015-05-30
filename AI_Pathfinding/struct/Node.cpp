@@ -49,7 +49,7 @@ int Node::getGScore() {
 }
 
 int Node::getHScore(Node *n) {
-	return (abs(n->getX() - x) + abs(n->getY() - y)) * 10;
+	return (std::abs(n->getX() - x) + std::abs(n->getY() - y)) * 10;
 }
 
 int Node::getHScore() {
@@ -107,9 +107,4 @@ bool Node::equals(Node *n) {
 	else {
 		return false;
 	}
-}
-
-std::string Node::toString() {
-	return "(" + std::to_string(x) + ", " + std::to_string(y) + ", " +
-		std::to_string(obstacle) + ")";
 }

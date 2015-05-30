@@ -1,6 +1,7 @@
 #ifndef NODE_INCLUDE
 #define NODE_INCLUDE
 #include <string>
+#include <cmath>
 
 class Node {
 private:
@@ -40,7 +41,6 @@ public:
 	void computeScoresBFS(Node *end);
 
 	bool equals(Node *n);
-	std::string toString();
 };
 
 #endif

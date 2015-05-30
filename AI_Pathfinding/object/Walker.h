@@ -7,8 +7,8 @@
 #include <SFML/Graphics/Transformable.hpp>
 #include <SFML/System/Vector2.hpp>
 
-#include "..\util\Animation.h"
-#include "..\util\Util.h"
+#include "../util/Animation.h"
+#include "../util/Util.h"
 
 class Walker : public sf::Drawable, public sf::Transformable
 {

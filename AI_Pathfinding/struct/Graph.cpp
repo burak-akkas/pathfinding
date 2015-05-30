@@ -14,7 +14,6 @@ Graph::Graph(int s) {
 
 Graph::~Graph() {
 	grid.clear();
-	grid.shrink_to_fit();
 }
 
 void Graph::initGrid() {
@@ -129,7 +128,7 @@ std::vector<int> Graph::findShortestPathAstar(int start_x, int start_y, int fini
 
 		if (n >= bound) {
 			std::vector<int> t; 
-			std::cout << "Tried " << bound << " times to find a path!" << std::endl;
+			//std::cout << "Tried " << bound << " times to find a path!" << std::endl;
 			resetNodes();
 			return t; 
 		}
@@ -227,7 +226,7 @@ std::vector<int> Graph::findShortestPathDijkstra(int start_x, int start_y, int f
 
 		if (n >= bound) {
 			std::vector<int> t;
-			std::cout << "Tried " << bound << " times to find a path!" << std::endl;
+			//std::cout << "Tried " << bound << " times to find a path!" << std::endl;
 			resetNodes();
 			return t;
 		}
@@ -323,7 +322,7 @@ std::vector<int> Graph::findShortestPathBFS(int start_x, int start_y, int finish
 
 		if (n >= bound) {
 			std::vector<int> t;
-			std::cout << "Tried " << bound << " times to find a path!" << std::endl;
+			//std::cout << "Tried " << bound << " times to find a path!" << std::endl;
 			resetNodes();
 			return t;
 		}

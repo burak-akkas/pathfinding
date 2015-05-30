@@ -1,8 +1,8 @@
 #ifndef TEXTMAN_INCLUDE
 #define TEXTMAN_INCLUDE
 
-#include <SFML\Graphics\Font.hpp>
-#include <SFML\Graphics\Text.hpp>
+#include <SFML/Graphics/Font.hpp>
+#include <SFML/Graphics/Text.hpp>
 
 class TextManager {
 private:

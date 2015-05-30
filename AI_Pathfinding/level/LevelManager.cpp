@@ -4,9 +4,9 @@ LevelManager::LevelManager() {
 	level_count = 3;
 	current_level = 1;
 	
-	level_paths.push_back(".\\level\\levels\\level1.txt");
-	level_paths.push_back(".\\level\\levels\\level2.txt");
-	level_paths.push_back(".\\level\\levels\\level3.txt");
+	level_paths.push_back(".//level//levels//level1.txt");
+	level_paths.push_back(".//level//levels//level2.txt");
+	level_paths.push_back(".//level//levels//level3.txt");
 }
 
 int LevelManager::getLevelCount() {
@@ -19,7 +19,7 @@ int LevelManager::getCurrentLevel() {
 
 void LevelManager::loadLevel(Graph *g, int level, int curr_x, int curr_y) {
 	if (level <= level_paths.size()) {
-		std::fstream file(level_paths.at(level - 1), std::ios_base::in);
+		std::fstream file(level_paths.at(level - 1).c_str(), std::ios_base::in);
 		
 		// reset current level
 		int size = g->getSize();

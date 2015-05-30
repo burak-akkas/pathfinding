@@ -1,9 +1,8 @@
-#pragma once
-#include "struct\Graph.h"
-#include "struct\TileMap.h"
-#include "object\Walker.h"
-#include "ui\TextManager.h"
-#include "level\LevelManager.h"
+#include "struct/Graph.h"
+#include "struct/TileMap.h"
+#include "object/Walker.h"
+#include "ui/TextManager.h"
+#include "level/LevelManager.h"
 
 const int frame_limit = 60;
 const int screen_height = 512, screen_width = 512;
@@ -24,7 +23,7 @@ int main() {
 	int mouse_x = 0, mouse_y = 0;
 
 	// create the window
-	sf::RenderWindow window(sf::VideoMode(screen_width, screen_height), window_title, sf::Style::Default);
+	sf::RenderWindow window(sf::VideoMode(screen_width, screen_height), window_title, sf::Style::Titlebar | sf::Style::Close);
 
 	// limit fps
 	window.setVerticalSyncEnabled(true);
@@ -117,6 +116,11 @@ int main() {
 				mouse_x = coord.x / coord_pixel;
 				mouse_y = coord.y / coord_pixel;
 
+				if(mouse_x >= graph_size || mouse_y >= graph_size) {
+					mouse_x = 15;
+					mouse_y = 15;				
+				}
+
 				if ((mouse_x != x1 || mouse_y != y1)) {
 
 					if (!g->isObstacle(mouse_x, mouse_y)) {
@@ -136,6 +140,12 @@ int main() {
 				mouse_x = coord.x / coord_pixel;
 				mouse_y = coord.y / coord_pixel;
 
+				if(mouse_x >= graph_size || mouse_y >= graph_size) {
+					mouse_x = 15;
+					mouse_y = 15;				
+				}
+
+
 				if (walker.isCanMove() == false)
 				if (!g->isObstacle(mouse_x, mouse_y)) {
 					sf::Vector2i backup(x, y), backup2(x1, y1);
@@ -147,13 +157,13 @@ int main() {
 					switch (selection) {
 						case 0:
 							if (!map.update(g->findShortestPathAstar(x, y, x1, y1, &directions))) {
-								std::cout << "No path exists!" << std::endl;
+								//std::cout << "No path exists!" << std::endl;
 								x = backup.x; y = backup.y;
 								x1 = backup2.x; y1 = backup2.y;
 							}
 							else {
 								// set text to be drawn
-								textManager.setExecText("Exec time: " + std::to_string(g->getExecTime().asMilliseconds()) + " ms");
+								textManager.setExecText("Exec time: " + std::to_string(g->getExecTime().asMicroseconds()) + " microsec");
 
 								// set walkers path
 								walker.setPath(Util::nodeToVec(directions));
@@ -161,13 +171,13 @@ int main() {
 							break;
 						case 1:
 							if (!map.update(g->findShortestPathBFS(x, y, x1, y1, &directions))) {
-								std::cout << "No path exists!" << std::endl;
+								//std::cout << "No path exists!" << std::endl;
 								x = backup.x; y = backup.y;
 								x1 = backup2.x; y1 = backup2.y;
 							}
 							else {
 								// set text to be drawn
-								textManager.setExecText("Exec time: " + std::to_string(g->getExecTime().asMilliseconds()) + " ms");
+								textManager.setExecText("Exec time: " + std::to_string(g->getExecTime().asMicroseconds()) + " microsec");
 
 								// set walkers path
 								walker.setPath(Util::nodeToVec(directions));
@@ -175,17 +185,19 @@ int main() {
 							break;
 						case 2:
 							if (!map.update(g->findShortestPathDijkstra(x, y, x1, y1, &directions))) {
-								std::cout << "No path exists!" << std::endl;
+								//std::cout << "No path exists!" << std::endl;
 								x = backup.x; y = backup.y;
 								x1 = backup2.x; y1 = backup2.y;
 							}
 							else {
 								// set text to be drawn
-								textManager.setExecText("Exec time: " + std::to_string(g->getExecTime().asMilliseconds()) + " ms");
+								textManager.setExecText("Exec time: " + std::to_string(g->getExecTime().asMicroseconds()) + " microsec");
 
 								// set walkers path
 								walker.setPath(Util::nodeToVec(directions));
 							}
+							break;
+						default:
 							break;
 					}
 				}
@@ -198,7 +210,7 @@ int main() {
 
 		// clear old directions
 		directions.clear();
-		directions.shrink_to_fit();
+		//directions.shrink_to_fit();
 
 		walker.move(frameTime.asSeconds());
 

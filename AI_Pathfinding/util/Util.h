@@ -1,7 +1,7 @@
 #ifndef UTIL_INCLUDE
 #define UTIL_INCLUDE
-#include "..\struct\Node.h"
-#include <SFML\Graphics\Vertex.hpp>
+#include "../struct/Node.h"
+#include <SFML/Graphics/Vertex.hpp>
 #include <cmath>
 #include <vector>
 
